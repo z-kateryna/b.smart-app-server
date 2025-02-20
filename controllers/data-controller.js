@@ -1,5 +1,6 @@
 import { generateResponse } from "./openai-controller.js";
 import { generateFeedResponse } from "./openai-feed-controller.js";
+import { generateQueryResponse } from "./openai-search-controller.js";
 
 export const processUserChoice = async (req, res) => {
     try {
@@ -40,4 +41,25 @@ export const processUserSubtopicChoice = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+export const processUserSubtopicSearch = async (req, res) => {
+    try {
+        const { query } = req.body;
+
+        if (!query) {
+            return res.status(400).json({ error: "Missing query" });
+        }
+
+        const aiResponse = await generateQueryResponse( {query} );
+
+        return res.status(200).json({
+            success:true,
+            query:aiResponse
+        });
+
+    } catch {
+        console.error("Error processing user query:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 
