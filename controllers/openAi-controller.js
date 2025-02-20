@@ -12,11 +12,22 @@ const openai = new OpenAI({
 async function generateResponse({ topic }) {
     const prompt = `
     I am a user of a microlearning app. Based on the chosen topic "${topic}", provide me with beginner-level subtopics.
-    Response structure: give just 1-2 word options for each subtopic. Only beginner level, 20 topics at least. Here is example: for Computer programming topic: Intro to JS, Intro to HTML, Basic CSS, Computer science principals. 
-
-Intro to SQL: Querying and managing data
-    Ensure that the response is clear and written in simple language. The response has to be an array of objects in json format, each of the subtopics has to have an id and a name. 
+    Response structure:
+    - Please return an array of objects in JSON format.
+    - Each object should have a "topic", a topic that user has chosen, an "id" (a number starting from 1) and a "name" (a beginner-level subtopic name).
+    - Break down the general topic into smaller, logical and easy to understand sub-topics.
+    - Provide at least 20 subtopics for each topic.
+    - The subtopics should be beginner-friendly, consisting of 1-2 words. For example, for the topic "Computer programming": 
+       - "Intro to JS"
+       - "Intro to HTML"
+       - "Basic CSS"
+       - "Intro to SQL"
+       - and so on.
+    Make sure the response is simple and easily understandable.
+    
+    The response must **ONLY** include the JSON array with subtopics. Do not add any additional explanations or formatting outside of the JSON structure.
     `;
+    
 
     try {
         const response = await openai.chat.completions.create({
@@ -42,21 +53,8 @@ Intro to SQL: Querying and managing data
         const test = JSON.parse(generatedResponse);
         console.log(test);
 
-        // // Extract subtopics from the response string
-        // const subtopicPattern = /\d+\.\s*([a-zA-Z\s]+)/g;  // Match numbered subtopics
-        // const subtopics = [];
-        // let match;
 
-        // // Loop through the matches and create an array of objects
-        // while ((match = subtopicPattern.exec(generatedResponse)) !== null) {
-        //     subtopics.push({
-        //         id: subtopics.length + 1,  // Generate unique ID
-        //         name: match[1].trim(),     // Clean the name from the matched string
-        //     });
-        // }
-
-        // console.log("Formatted Subtopics:", subtopics);
-        return test.subtopics;  // Return an array of objects
+        return test.subtopics; 
 
     } catch (error) {
         console.error("OpenAI API Error:", error);
