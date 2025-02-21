@@ -9,26 +9,31 @@ const openai = new OpenAI({
     apiKey: APIKEY,
 });
 
-async function generateResponse({ topic }) {
+async function generateResponse({ topic}) {
+
+
     const prompt = `
-    I am a user of a microlearning app. Based on the chosen topic "${topic}", provide me with beginner-level subtopics.
-    Response structure:
-    - Please return an array of objects in JSON format.
-    - Each object should have a "topic", a topic that user has chosen, an "id" (a number starting from 1) and a "name" (a beginner-level subtopic name).
-    - Break down the general topic into smaller, logical and easy to understand sub-topics.
-    - Provide at least 20 subtopics for each topic.
-    - The subtopics should be beginner-friendly, consisting of 1-2 words. For example, for the topic "Computer programming": 
-       - "Intro to JS"
-       - "Intro to HTML"
-       - "Basic CSS"
-       - "Intro to SQL"
-       - and so on.
-    Make sure the response is simple and easily understandable.
+    I am a user of a microlearning app. Based on the chosen topic "${topic}", provide 30 subtopics that help to learn more about the subject.
     
-    The response must **ONLY** include the JSON array with subtopics. Do not add any additional explanations or formatting outside of the JSON structure.
+    Response structure:
+    - Return a JSON array with the following fields:
+      - "id" (Number starting from 1)
+      - "topic" (The user-chosen topic)
+      - "name" (The subtopic name in Title Case)
+      - "level" (The complexity level: "beginner", "intermediate", or "advanced")
+    - Break down the topic into smaller, logical subtopics, with 10 subtopics per level:
+      - 10 for "beginner"
+      - 10 for "intermediate"
+      - 10 for "advanced"
+    - Each subtopic should consist of 1-2 words. For example, for "Computer Programming":
+      - "Intro to JS" (beginner level)
+      - "HTML" (intermediate level)
+      - "MySQL Triggers" (advanced level)
+    - Keep the response simple and relevant to the chosen topic and level of complexity.
+    
+    Return **ONLY** the JSON array with subtopics. Do not add explanations or any other formatting.
     `;
     
-
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
@@ -41,7 +46,6 @@ async function generateResponse({ topic }) {
                     role: "user",
                     content: prompt,
                 },
-                
             ],
             response_format: { "type": "json_object" }
         });
@@ -50,11 +54,10 @@ async function generateResponse({ topic }) {
 
         console.log("OpenAI Response:", generatedResponse);
 
-        const test = JSON.parse(generatedResponse);
-        console.log(test);
+        const parsedResponse = JSON.parse(generatedResponse);
+        console.log(parsedResponse);
 
-
-        return test.subtopics; 
+        return parsedResponse.subtopics; 
 
     } catch (error) {
         console.error("OpenAI API Error:", error);
@@ -66,8 +69,5 @@ async function generateResponse({ topic }) {
         throw error;
     }
 }
-
-
-
 
 export { generateResponse };

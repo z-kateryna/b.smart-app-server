@@ -9,21 +9,23 @@ const openai = new OpenAI({
   apiKey: APIKEY,
 });
 
-async function generateQueryResponse({ query }) {
-  const prompt = `
-    I am a user of a microlearning app, and I am searching for beginner-level learning on the subtopic "${query}". Please provide:
+async function generateQueryResponse({ query, level}) {
 
-    The chosen subtopic, "${query}"
-    2-3 related subtopic suggestions based on "${query}"
-    Ensure the response is simple and easily understandable.
-
-    The response must only include a JSON array with the following structure for each object:
-
-    "id": A unique numeric identifier starting from 1
-    "query": The chosen subtopic, "${query}"
-    "subtopics": An array of 2-3 related subtopics
-    Do not add any additional explanations or formatting outside of the JSON structure.
-    `;
+    const prompt = `
+    I am a user of a microlearning app, searching for ${level}-level learning on the subtopic "${query}". Please provide the following:
+    
+    1. The chosen subtopic, "${query}"
+    2. 2-3 related subtopics that expand on "${query}" and are relevant to the specified level of complexity.
+    
+    Ensure that the subtopics are simple, clear, and easy to understand, without repeating content across different levels of complexity.
+    
+    The response must be a JSON array with the following structure for each object:
+    
+    {
+      "id": <unique numeric identifier starting from 1>,
+      "query": ["${query}", "related subtopic 1", "related subtopic 2", "related subtopic 3"]
+    }
+    `;    
 
   try {
     const response = await openai.chat.completions.create({
