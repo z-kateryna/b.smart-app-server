@@ -21,19 +21,11 @@ async function generateResponse({ topic}) {
       - "topic" (The user-chosen topic)
       - "name" (The subtopic name in Title Case)
       - "level" (The complexity level: "beginner", "intermediate", or "advanced")
-    - Break down the topic into smaller, logical subtopics, with 10 subtopics per level:
-      - 10 for "beginner"
-      - 10 for "intermediate"
-      - 10 for "advanced"
-    - Each subtopic should consist of 1-2 words. For example, for "Computer Programming":
-      - "Intro to JS" (beginner level)
-      - "HTML" (intermediate level)
-      - "MySQL Triggers" (advanced level)
-    - Keep the response simple and relevant to the chosen topic and level of complexity.
+
     
     Return **ONLY** the JSON array with subtopics. Do not add explanations or any other formatting.
     `;
-    
+    console.log("making openAI call")
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
@@ -47,8 +39,11 @@ async function generateResponse({ topic}) {
                     content: prompt,
                 },
             ],
-            response_format: { "type": "json_object" }
+            response_format: { "type": "json_object" },
         });
+
+        console.log("full response");
+        console.log(response.choices[0].content);
 
         let generatedResponse = response.choices[0].message.content.trim();
 
